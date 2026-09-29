@@ -1,0 +1,13 @@
+{
+  "name": "ijapa",
+  "owner": {
+    "name": "Olaide Ojewale"
+  },
+  "plugins": [
+    {
+      "name": "devcycle",
+      "source": "./devcycle",
+      "description": "Stack-agnostic phase-gated dev workflow (plan, test, execute, review) plus ticket, epic, PR, commit, squash, QA and prune helpers."
+    }
+  ]
+}

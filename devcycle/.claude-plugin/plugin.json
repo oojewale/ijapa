@@ -1,0 +1,9 @@
+{
+  "name": "devcycle",
+  "version": "0.1.0",
+  "description": "Stack-agnostic phase-gated dev workflow: plan, test, execute, review, plus ticket/PR/commit helpers.",
+  "author": { "name": "Olaide Ojewale" },
+  "license": "MIT",
+  "keywords": ["workflow", "tdd", "code-review", "planning", "jira", "pull-request"],
+  "commands": "./commands"
+}
