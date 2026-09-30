@@ -52,8 +52,6 @@ can reasonably infer from the project brief, epic, or the user's answers.
 ### Turn 3 — Generate (always)
 
 Generate all tickets using the format in `${CLAUDE_PLUGIN_ROOT}/resources/ticket.md`.
-Add a number or ticket code at the top of each ticket (e.g 001, 002, etc)
-If a ticket is dependent on another. Add the ticket(s) that it depends on in the `Blocked By` section referencing the blocking ticket(s) number.
 If anything is still unclear, add it under **Dependencies / Notes** — do not delay output.
 
 ---
@@ -70,12 +68,9 @@ with `---`. Create `.claude/artifacts/` if needed.
 
 - Never generate tickets before completing at least one clarification round.
 - At most, one user-facing behaviour or distinct technical concern per story — don't bundle unrelated work.
-- Ensure stories are not overly complex. Ideally each story is estimated by the team between 1-3 points.
-- Break complex work into multiple stories. Do not over complicate stories.
-- Expand acceptance criteria beyond what the user lists — think through edge cases and unhappy paths.
-- Do not invent requirements — flag uncertainty under Dependencies / Notes.
+- Keep stories small: ideally each is estimated by the team at 1-3 points. Break complex work
+  into multiple stories.
 - Do not use em dashes.
-- Do not hallucinate product decisions not grounded in the project brief or the user's input.
+- Do not invent requirements or product decisions not grounded in the project brief or the
+  user's input. Flag uncertainty under Dependencies / Notes.
 - If the input looks like a task rather than a story, flag it and ask whether to write it as a sub-task or elevate it.
-- Use numberings for information that need to be ordered under each heading except for Testing
-  - For testing, use check markdown boxes, i.e `- [ ]`

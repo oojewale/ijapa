@@ -64,6 +64,6 @@ if needed.
 
 - Never generate the epic before completing at least one clarification round.
 - Do not use em dashes.
-- Do not invent requirements — flag uncertainty as an open question.
-- Do not hallucinate product decisions not grounded in the project brief or the user's input.
+- Do not invent requirements or product decisions not grounded in the project brief or the
+  user's input. Flag uncertainty as an open question.
 - Keep the epic focused. If the scope feels like multiple epics, flag it.

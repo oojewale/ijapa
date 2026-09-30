@@ -50,3 +50,6 @@ Never invent a project convention. If you are guessing, say so.
   `<YYYY-MM-DD>-<slug>.<kind>.<ext>`
 
 Use today's date for `<YYYY-MM-DD>`. Create the directory if it does not exist.
+
+Plans and artifacts are local working files, not meant to be tracked in git. Never stage
+or commit them.

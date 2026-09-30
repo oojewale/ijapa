@@ -34,16 +34,16 @@ on the current branch as if they were one coherent change.
 - Tone: calm, direct, confident.
 - Highlight **intent and value**, not just what changed.
 - The title must be a single concise sentence. No period at the end.
-- The body should explain: what changed, why, and the value it delivers.
 - Do not list every commit verbatim — synthesise them into a coherent narrative.
 - Do not hallucinate changes. Use the diff as the source of truth.
-- Do not commit anything. Output the message only.
+- Do not commit anything.
 
 ---
 
 ## Output Format
 
-Output the commit message only, ready to paste into the version control's squash merge dialog:
+Output the commit message only, with no extra commentary, ready to paste into the version
+control's squash merge dialog:
 
 ```
 <concise title summarising the branch as one change>
@@ -52,5 +52,3 @@ Output the commit message only, ready to paste into the version control's squash
 
 <paragraph explaining the value or impact — omit if redundant>
 ```
-
-No extra commentary outside the commit message.
