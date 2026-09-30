@@ -53,36 +53,61 @@ discovery protocol itself.
 
 | Kind | Location | Tracked? |
 |------|----------|----------|
-| Plans | `.claude/plans/<YYYY-MM-DD>-<ticket>-<slug>.md` | no — add `.claude/plans/` to `.gitignore` |
-| Epics / ticket sets | `.claude/artifacts/epic-temp.md`, `.claude/artifacts/tickets-temp.md` (overwritten each run) | no — add `.claude/artifacts/` to `.gitignore` |
-| PR drafts / QA scripts | `.claude/artifacts/<YYYY-MM-DD>-<slug>.<kind>.<ext>` | no — add `.claude/artifacts/` to `.gitignore` |
+| Plans | `.claude/plans/<YYYY-MM-DD>-<ticket>-<slug>.md` | no |
+| Epics / ticket sets | `.claude/artifacts/epic-temp.md`, `.claude/artifacts/tickets-temp.md` (overwritten each run) | no |
+| PR drafts / QA scripts | `.claude/artifacts/<YYYY-MM-DD>-<slug>.<kind>.<ext>` | no |
 
 `prune` deletes date-stamped files in `.claude/artifacts/` older than a cutoff (default 8
 weeks); `--plans` extends it to `.claude/plans/`. It dry-runs and asks before deleting, and
 never touches files without a `YYYY-MM-DD` name prefix or files with uncommitted changes.
 
+### Recommended `.gitignore`
+
+Everything devcycle generates is a local working file. Add these to the consuming repo's
+`.gitignore` so running the commands never leaves the working tree dirty:
+
+```gitignore
+# devcycle generated files
+.claude/artifacts/
+# if you don't want plans tracked
+.claude/plans/
+```
+
+Keep `.claude/resources/` and `.claude/settings.json` tracked: they hold the shared project
+context and plugin setup the whole team relies on.
+
 ## Installing
 
-### For yourself
-
-From any repo:
+Add the marketplace, then install the plugin:
 
 ```
 /plugin marketplace add oojewale/ijapa
 /plugin install devcycle@ijapa
 ```
 
-### For everyone on a repo
+When asked for a scope, choose:
 
-Commit a `.claude/settings.json` to the repo. Anyone who opens it in Claude Code and trusts
-the folder is prompted to add the marketplace and enable the plugin:
+- **User** — just for you, in every repo.
+- **Project** — for everyone who works on this repo. Claude Code writes the marketplace and
+  plugin into the repo's `.claude/settings.json`; commit that file.
+
+Run `/reload-plugins` (or start a new session) and the `/devcycle:*` commands appear.
+
+### Teammates on a project-scoped repo
+
+After pulling the committed `.claude/settings.json`, a teammate opens the repo in Claude Code,
+trusts the folder, and accepts the prompt to add the ijapa marketplace. If the
+`/devcycle:*` commands still don't show up, running `/plugin install devcycle@ijapa` once
+fixes it.
+
+For reference, the settings Claude Code writes look like this:
 
 ```json
 {
+  "enabledPlugins": { "devcycle@ijapa": true },
   "extraKnownMarketplaces": {
     "ijapa": { "source": { "source": "github", "repo": "oojewale/ijapa" } }
-  },
-  "enabledPlugins": { "devcycle@ijapa": true }
+  }
 }
 ```
 

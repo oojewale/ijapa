@@ -32,10 +32,14 @@ Files without a leading `YYYY-MM-DD` date in the name are never touched.
 1. Compute the cutoff date = today minus the given age.
 2. List candidate files in the target directories whose **filename date prefix** is
    older than the cutoff. Use the filename date, not the filesystem mtime.
-3. For each candidate, check git status. **Exclude** any file that is:
+3. For each candidate, check git status, including ignored files (e.g.
+   `git status --porcelain --ignored`), since these directories are usually git-ignored.
+   **Exclude** any file that is:
    - staged or has uncommitted modifications, or
-   - untracked but newer than the cutoff by mtime (safety net against a misnamed recent file).
-   Tracked-and-clean or untracked-and-old files are eligible.
+   - untracked or git-ignored, but newer than the cutoff by mtime (safety net against a
+     misnamed recent file).
+   Tracked-and-clean files, and untracked or git-ignored files older than the cutoff by
+   mtime, are eligible.
 4. Print the eligible list grouped by directory, with each file's age, and the total count.
    Also print what was skipped and why.
 5. **Dry run by default:** stop here and ask the user to confirm deletion. With `--auto`,
