@@ -61,24 +61,36 @@ discovery protocol itself.
 weeks); `--plans` extends it to `.claude/plans/`. It dry-runs and asks before deleting, and
 never touches files without a `YYYY-MM-DD` name prefix or files with uncommitted changes.
 
-## Installing (local)
+## Installing
+
+### For yourself
 
 From any repo:
 
 ```
-/plugin marketplace add ../ijapa        # or an absolute path
+/plugin marketplace add oojewale/ijapa
 /plugin install devcycle@ijapa
 ```
 
-To share via a git remote later, commit a `.claude/settings.json` in each repo:
+### For everyone on a repo
+
+Commit a `.claude/settings.json` to the repo. Anyone who opens it in Claude Code and trusts
+the folder is prompted to add the marketplace and enable the plugin:
 
 ```json
 {
   "extraKnownMarketplaces": {
-    "ijapa": { "source": { "source": "git", "url": "<repo-url>" } }
+    "ijapa": { "source": { "source": "github", "repo": "oojewale/ijapa" } }
   },
-  "enabledPlugins": ["devcycle@ijapa"]
+  "enabledPlugins": { "devcycle@ijapa": true }
 }
+```
+
+### From a local clone (for plugin development)
+
+```
+/plugin marketplace add ../ijapa        # or an absolute path
+/plugin install devcycle@ijapa
 ```
 
 ## Updating
