@@ -114,7 +114,8 @@ to reason about end-to-end in a console/request-by-request than as isolated unit
    can be copied into a client like Postman.
 7. Save the script to `.claude/artifacts/<YYYY-MM-DD>-<slug>.qa.<ext>` (today's date;
    slug derived from the plan/task/ticket name; extension matching the language) and don't
-   show it inline. Create `.claude/artifacts/` if needed.
+   show it inline. Put the **Results** list from the Output Format at the top of the script
+   as a comment, so `devcycle:pr` can read which scenarios passed. Create `.claude/artifacts/` if needed.
 8. Report the run in the Output Format below, then ask the user whether to fix any bugs
    found now or log them for follow-up.
 
@@ -126,6 +127,10 @@ to reason about end-to-end in a console/request-by-request than as isolated unit
 ### QA Run — <slug>
 
 **Scenarios verified:** N/M (list any not verified and why — e.g. needs a real Stripe key)
+
+**Results:**
+  - [x] <scenario> 
+  - [ ] <scenario> — failed / not verified: <reason>
 
 **Bugs found:** (omit this section entirely if none)
   - [file:line] <one-line description of the bug, and how the scenario exposed it>

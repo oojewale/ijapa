@@ -1,5 +1,5 @@
 ---
-description: Run the full phase-gated dev workflow (plan, tests, execute, review)
+description: Run the full phase-gated dev workflow (plan, tests, execute, review, QA, PR description)
 argument-hint: <story or task> [--path <files>] [--plan <plan file>] [--auto]
 ---
 
@@ -75,6 +75,22 @@ Present the review. If issues are found, ask whether to address them now or log 
 
 ---
 
+## Phase 5 — QA
+
+Follow the instructions in `${CLAUDE_PLUGIN_ROOT}/commands/qa.md`, using the ticket's
+**Testing** steps and the plan's acceptance scenarios.
+
+⏸ **[Guided]** Ask whether to run QA now or skip it. Report the script path and results.
+
+---
+
+## Phase 6 — PR description
+
+Follow the instructions in `${CLAUDE_PLUGIN_ROOT}/commands/pr.md`, giving it the ticket,
+the plan and the QA script from Phase 5. Report only the file path.
+
+---
+
 ## General Guardrails
 
 - Do not make any git commits or push at any point.
@@ -96,7 +112,9 @@ In `--auto` mode **only**, after all phases complete, output:
 
 **Task:** ...
 **Plan file:** .claude/plans/<YYYY-MM-DD>-<ticket-or-slug>.md
-**Phases completed:** Plan, Tests, Execute, Review
+**Phases completed:** Plan, Tests, Execute, Review, QA, PR description
+**QA script:** .claude/artifacts/<YYYY-MM-DD>-<slug>.qa.<ext>
+**PR description:** .claude/artifacts/<YYYY-MM-DD>-<slug>.pr.md
 
 **Changes made:**
 - ...

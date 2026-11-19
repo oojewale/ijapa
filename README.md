@@ -15,7 +15,8 @@ repo.
 
 | Command | Purpose |
 |---------|---------|
-| `/devcycle:dev` | Orchestrator for the full phase-gated workflow |
+| `/devcycle:dev` | Orchestrator for the full phase-gated workflow (plan → tests → execute → review → QA → PR description) |
+| `/devcycle:parallel` | Several tickets at once — one agent and git worktree each, plans approved first |
 | `/devcycle:plan` | Phase 1 — planning |
 | `/devcycle:test` | Phase 2 — failing tests that define the contract |
 | `/devcycle:execute` | Phase 3 — implementation (TDD green) |
@@ -26,7 +27,7 @@ repo.
 | `/devcycle:squash` | Squash-and-merge commit message |
 | `/devcycle:ticket` | Project management tool Story creation (e.g JIRA, Linear, Trello) |
 | `/devcycle:epic` | Project management tool Epic creation (e.g JIRA, Linear, Trello) |
-| `/devcycle:prune` | Remove aged generated artifacts |
+| `/devcycle:prune` | Remove aged generated artifacts and, with `--worktrees`, merged worktrees |
 
 ## How it adapts to a project
 
@@ -56,10 +57,13 @@ discovery protocol itself.
 | Plans | `.claude/plans/<YYYY-MM-DD>-<ticket>-<slug>.md` | no |
 | Epics / ticket sets | `.claude/artifacts/epic-temp.md`, `.claude/artifacts/tickets-temp.md` (overwritten each run) | no |
 | PR drafts / QA scripts | `.claude/artifacts/<YYYY-MM-DD>-<slug>.<kind>.<ext>` | no |
+| `parallel` branches | one git worktree + local branch per ticket, kept until you remove it | branch only |
 
 `prune` deletes date-stamped files in `.claude/artifacts/` older than a cutoff (default 8
 weeks); `--plans` extends it to `.claude/plans/`. It dry-runs and asks before deleting, and
 never touches files without a `YYYY-MM-DD` name prefix or files with uncommitted changes.
+`--worktrees` also removes worktrees under `.claude/worktrees/` whose branch is merged
+(squash merges included, via `gh`), plus their local branches — never unmerged work.
 
 ### Recommended `.gitignore`
 
@@ -75,6 +79,41 @@ Everything devcycle generates is a local working file. Add these to the consumin
 
 Keep `.claude/resources/` and `.claude/settings.json` tracked: they hold the shared project
 context and plugin setup the whole team relies on.
+
+### Running tickets in parallel (`/devcycle:parallel`)
+
+Each ticket runs in its own git worktree, which contains only tracked files. To let
+agents run your tests there:
+
+1. **Copy gitignored config** into every worktree with a `.worktreeinclude` file at the
+   repo root (`.gitignore` syntax), e.g.
+
+   ```text
+   .env
+   config/master.key
+   ```
+
+2. **Document worktree setup** in `.claude/resources/testing.md` under a
+   `## Worktree setup` heading — the commands a fresh worktree needs. For a Rails app on
+   Postgres or MySQL, give each worktree its own test database:
+
+   ```yaml
+   # config/database.yml
+   test:
+     database: myapp_test<%= ENV["DB_SUFFIX"] %>
+   ```
+
+   ```markdown
+   ## Worktree setup
+   - `bundle install`
+   - `DB_SUFFIX=_<ticket> bin/rails db:test:prepare`, and prefix test runs with the same
+     `DB_SUFFIX`
+   - Clean up after removing the worktree: `DB_SUFFIX=_<ticket> RAILS_ENV=test bin/rails db:drop`
+   ```
+
+   SQLite apps need no database step: each worktree has its own database file.
+
+3. Add `.claude/worktrees/` to `.gitignore`.
 
 ## Installing
 
@@ -120,8 +159,14 @@ For reference, the settings Claude Code writes look like this:
 
 ## Updating
 
-Bump `version` in `devcycle/.claude-plugin/plugin.json`, note it in `CHANGELOG.md`,
-push, and consumers run `/plugin update devcycle`.
+Bump `version` in `devcycle/.claude-plugin/plugin.json`, note it in `CHANGELOG.md`, and
+push. Consumers only receive a release when `version` changes.
+
+Auto-update is off by default for third-party marketplaces. Consumers either:
+
+- turn it on once: `/plugin` → **Marketplaces** → `ijapa` → **Enable auto-update**, or
+- update manually: `/plugin marketplace update ijapa` in a session, or
+  `claude plugin update devcycle@ijapa` in the shell.
 
 ## License
 

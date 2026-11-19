@@ -24,6 +24,11 @@ Create a best-in-class PR description for the user's code changes using the PR t
 * The PR description template is the repo's own, typically `.github/pull_request_template.md`
   or `pull_request_template.md`.
 * Inline user input follows the **Input Format** below.
+* **Ticket, plan and QA run**, when available (passed in, or found: the plan in
+  `.claude/plans/` and the QA script in `.claude/artifacts/*.qa.*` matching this branch's
+  ticket or slug). Use the ticket for the problem and issue link, the plan for the
+  approach, risks and rollback, and the QA script's **Results** for the QA section. They
+  fill fields the user didn't provide; the user's inline input wins on conflict.
 * Some PRs have no direct customer impact (e.g., refactors or platform improvements). In those cases, highlight the internal or long-term value.
 
 ---
@@ -83,19 +88,23 @@ Notes:
 2. Parse all inline input following the Input Format.
 3. Map each field into the PR template by semantic intent. If a field does not logically belong anywhere, omit it.
 4. Populate the template per the template-integrity constraint.
-5. Insert QA steps where the Response Structure places them, listing each QA step like:
-   ```
-   - [ ] step 1
-   - [ ] step 2
-   ...
-   ```
+5. Insert QA steps where the Response Structure places them.
+   * **If a QA run exists** (`devcycle:qa` results): title the section
+     **QA Steps (Run by Claude)** and tick every scenario that passed. Leave failed or
+     unverified ones unticked with a short reason:
+     ```
+     - [x] step 1
+     - [ ] step 2 — not verified: needs a real Stripe key
+     ```
+   * **Otherwise:** title it **QA Steps** and leave every step unticked for a human.
 6. Write the final PR description in valid GitHub Markdown to `.claude/artifacts/<YYYY-MM-DD>-<slug>.pr.md` (today's date; `<slug>` from the branch or ticket). It will be copied from there to the PR. Create `.claude/artifacts/` if needed.
 
 ---
 
 ## **Response Structure**
 
-* Output should be **only** the fully populated PR description using the template, with no extra commentary.
+* The file should contain **only** the fully populated PR description using the template, with no extra commentary.
+* In the conversation, report only the file path. Do not print the description.
 * Drop the labels from the Input Format; use only the content.
 * If the repo's template already has a place for QA steps, keep them there. Otherwise, add
   the QA Steps section last.
