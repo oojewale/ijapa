@@ -59,16 +59,22 @@ implementation has to satisfy.
 
 1. Read the guardrails in `${CLAUDE_PLUGIN_ROOT}/commands/execute.md`; they apply here too.
 2. Read the plan file fully before writing any tests, and parse any inline input.
-3. Identify the behavioural contract the plan describes — inputs, outputs, side effects,
-   error conditions — and translate each into a test.
-4. Add the generated tests to the relevant test files. If a file does not exist, create it
+3. Start from the plan's **Acceptance scenarios**. Each scenario (`S1`, `S2`, …) gets at
+   least one test whose structure mirrors it: the Given is the setup, the When is the
+   action, the Then is the assertion. Name or describe the test so it's traceable to its
+   scenario (e.g. include the scenario wording). Use the project's existing test framework
+   and style — do not add a BDD tool such as Cucumber unless the project already uses one.
+4. Then cover the rest of the behavioural contract the plan describes — edge cases, error
+   conditions, boundaries — that the scenarios don't already cover.
+5. Add the generated tests to the relevant test files. If a file does not exist, create it
    in the appropriate directory based on the structure of the codebase.
 
 ---
 
 ## **Response Structure**
 
-* No extra commentary outside the generated tests.
+* No extra commentary outside the generated tests, except a short scenario → test map
+  (`S1 → spec/requests/foo_spec.rb:12`), so review can check every scenario is covered.
 * End by asking the user to run the tests and confirm they fail for the right reason
   (TDD red) — i.e. because the implementation does not exist yet, not due to faults in the
   tests themselves.

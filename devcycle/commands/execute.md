@@ -110,3 +110,18 @@ After implementation, produce a concise diff summary:
 - Any follow-up items or concerns
 
 End by asking the user to run the Phase 2 tests and confirm they pass (TDD green).
+
+**Green means CI would pass for what changed, not just the new tests.** Find the checks
+this project's CI runs (CI config such as `.github/workflows/`, plus `Makefile`,
+`package.json` scripts, `bin/` scripts — tests, linters, formatters, type-checkers), then
+scope them to the change:
+
+- **Tests:** those for the changed files, plus adjacent areas the change could break
+  (callers, shared modules, integration tests covering the flow).
+- **Linters, formatters, type-checkers:** on the changed files, or the narrowest scope the
+  tool allows.
+- Don't run the whole suite or repo-wide checks — slow on large codebases, and CI covers
+  them on the PR — unless the project's guidance says to, or the change is cross-cutting
+  (shared config, base classes, dependencies); then say why.
+
+List the exact commands for the user to run alongside the Phase 2 tests.

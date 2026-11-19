@@ -39,12 +39,31 @@ Your job is to produce a thorough, actionable plan before any code is written.
    - Do any signatures or boundaries need to change?
 6. If you need clarification or information, ask all your questions at once and wait for the
    answers before writing the plan.
-7. Break the work into clear, ordered, implementable steps.
-8. Flag risks, ambiguities, or decisions that need input before coding begins.
-9. Include diagrams where applicable:
-   - **Flow diagram** — when the task involves a multi-step process, request lifecycle, or state transitions.
-   - **Dependency diagram** — when the task involves multiple components, services, or modules that interact.
-   - Use both if the task warrants it. Use correct and valid Mermaid syntax.
+7. Extract the **acceptance scenarios**: copy each Given/When/Then from the ticket's
+   Acceptance Criteria, numbered `S1`, `S2`, … If the task has none, write them from the
+   task description (and say so). They are the definition of done that tests and review
+   check against, so each must be concrete and observable — no "works correctly".
+8. Break the work into clear, ordered, implementable steps. Note which scenario(s) each
+   step satisfies.
+9. List every file you expect to create or change, by path. Parallel runs use this list to
+   spot tickets likely to conflict.
+10. Estimate the size of the change. If it's likely to exceed about 400 changed lines
+    (excluding generated files and lockfiles) — or the project's own limit, if it sets
+    one — propose how to split it into smaller tickets or stacked PRs under Risks.
+11. Flag risks, ambiguities, or decisions that need input before coding begins.
+12. Include 0–2 diagrams, each chosen from the rubric below and only when it shows
+    something the prose can't. Give each a one-line caption saying what question it
+    answers. Use correct and valid Mermaid syntax. For a change that restructures
+    something existing (schema, module boundaries, a state machine), prefer a
+    before/after pair of the same type, captioned with what changed.
+
+    | What the change looks like | Diagram | Mermaid |
+    |---|---|---|
+    | Interaction over time across components (controller → service → job → external API, async/callbacks, retries) | Sequence | `sequenceDiagram` |
+    | Entity lifecycle or status transitions | State | `stateDiagram-v2` |
+    | New or changed tables, associations, migrations | ER | `erDiagram` |
+    | Branching logic inside a single unit (business rules, an algorithm) | Flowchart | `flowchart TD` |
+    | Coupling across modules/domains/gateways, blast radius, migration order | Dependency | `graph LR` |
 
 
 ## Guardrails
@@ -74,29 +93,29 @@ Use this structure inside the file:
 **Affected areas:**
 - ...
 
+**Files expected to change:**
+- path/to/file (new | changed)
+
+**Estimated size:** ~N changed lines (split proposal under Risks if over budget)
+
 **Assumptions:**
 - ...
 
+**Acceptance scenarios:**
+- S1: Given ..., when ..., then ...
+- S2: ...
+
 **Steps:**
-1. ...
+1. ... (S1)
 2. ...
 
 **Risks / questions:**
 - ...
 
-## Flow Diagram
-<!-- Include if the task involves a multi-step process, request lifecycle, or state transitions -->
-```mermaid
-flowchart TD
-  ...
-```
-
-## Dependency Diagram
-<!-- Include if the task involves multiple interacting components, services, or modules -->
-```mermaid
-graph LR
-  ...
-```
+## Diagrams
+<!-- 0–2 diagrams chosen via the rubric. Each: a heading naming the type, a one-line caption
+     saying what question it answers, then the mermaid block.
+     If none are needed, write "None — prose suffices." -->
 ```
 
 After writing the file, do NOT print the plan to the conversation.

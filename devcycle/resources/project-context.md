@@ -1,5 +1,16 @@
 # Project Context Discovery
 
+## Rules that apply to every devcycle command
+
+- **The project's guidance wins.** Whatever this protocol finds (`CLAUDE.md`,
+  `.claude/resources/*.md`, best-practice docs, lint/style config, existing code
+  patterns) overrides this plugin's generic defaults, examples and thresholds. Look
+  before you write, and when the project and the plugin disagree, follow the project and
+  say so.
+- **Never print a generated file.** When a command writes a file (plan, QA script, PR
+  description, epic, tickets, anything else), report only its path. Do not echo its
+  contents to the conversation unless the user asks to see it.
+
 Every command in this plugin is stack-agnostic. Before doing the work, discover how
 *this* project wants things done. Use what you find; degrade gracefully when you find
 nothing.

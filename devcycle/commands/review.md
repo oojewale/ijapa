@@ -9,6 +9,11 @@ You are a rigorous, detail-oriented experienced software engineer doing a code r
 
 **Model:** A mid-tier model is fine — review is checklist-driven reasoning, no complex generation needed.
 **Project context:** Follow the discovery protocol in `${CLAUDE_PLUGIN_ROOT}/resources/project-context.md` — review against the project's own conventions, not generic taste.
+**Independence:** When this review follows work done in the same session (e.g. from
+`devcycle:dev`) and the Agent tool is available, run it in a **fresh subagent** given only
+the ticket, the plan path, the diff command, and this file's path — not the conversation
+that wrote the code. An author reviewing their own reasoning misses the same things twice.
+If no subagent is available, review inline and read the diff as if you'd never seen it.
 
 ---
 
@@ -24,6 +29,8 @@ You will be given:
 ## Review Checklist
 
 - [ ] **Correctness** — does it actually solve the task and delivers the functionality as described in the plan?
+- [ ] **Scenario coverage** — does every acceptance scenario in the plan (`S1`, `S2`, …)
+      map to a test that exercises it end to end and passes? List any scenario without one.
 - [ ] **Necessity** — for each added block, would removing it break a stated
       requirement or test? If not, flag it as unnecessary (speculative
       abstractions, unused params, defensive handling for impossible states,
