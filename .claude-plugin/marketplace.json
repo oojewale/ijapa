@@ -1,5 +1,6 @@
 {
   "name": "ijapa",
+  "description": "Claude Code plugins that adapt to whatever project they land in, reading its own conventions instead of assuming one way of working.",
   "owner": {
     "name": "Olaide Ojewale"
   },
@@ -7,7 +8,7 @@
     {
       "name": "devcycle",
       "source": "./devcycle",
-      "description": "Stack-agnostic phase-gated dev workflow (plan, test, execute, review) plus ticket, epic, PR, commit, squash, QA and prune helpers."
+      "description": "Stack-agnostic phase-gated dev workflow (plan, test, execute, review, QA, PR description), for one ticket or several in parallel with git worktrees, plus ticket, epic, commit, squash and prune helpers."
     }
   ]
 }

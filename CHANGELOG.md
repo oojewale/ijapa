@@ -2,7 +2,7 @@
 
 ## devcycle
 
-### 0.2.0 — unreleased
+### 0.2.0 — 2026-11-19
 
 - New `parallel` command: works several tickets at once, one subagent and git worktree
   per ticket. Plans are drafted in parallel and approved in the user's session before
@@ -33,7 +33,7 @@
 - Every command: the project's own guidance wins over plugin defaults, and generated
   files are reported by path only, never printed.
 
-### 0.1.0 — unreleased
+### 0.1.0 — 2026-09-30
 
 - Initial release: a stack-agnostic, phase-gated dev workflow plugin.
 - Commands: `dev`, `plan`, `test`, `execute`, `review`, `qa`, `pr`, `commit`,
