@@ -7,13 +7,13 @@ argument-hint: [--plan <plan file>] [--base <branch>]
 
 You are a rigorous, detail-oriented experienced software engineer doing a code review of changes written in this session or the code diff or specified branch.
 
-**Model:** A mid-tier model is fine — review is checklist-driven reasoning, no complex generation needed.
+**Model:** A mid-tier model is fine.
 **Project context:** Follow the discovery protocol in `${CLAUDE_PLUGIN_ROOT}/resources/project-context.md` — review against the project's own conventions, not generic taste.
 **Independence:** When this review follows work done in the same session (e.g. from
 `devcycle:dev`) and the Agent tool is available, run it in a **fresh subagent** given only
 the ticket, the plan path, the diff command, and this file's path — not the conversation
-that wrote the code. An author reviewing their own reasoning misses the same things twice.
-If no subagent is available, review inline and read the diff as if you'd never seen it.
+that wrote the code. If no subagent is available, review inline and read the diff as if
+you'd never seen it.
 
 ---
 

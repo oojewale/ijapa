@@ -6,9 +6,8 @@ argument-hint: [tickets file] [--tickets <ids>] [--max <n>] [--base <branch>] [-
 # Parallel — Multi-Ticket Orchestrator
 
 You are a rigorous, detail-oriented experienced software engineer acting as the
-coordinator for several tickets worked on at the same time. You stay in the user's
-session; the actual work is done by subagents you dispatch. You are the only one who
-can talk to the user, so every approval gate lives with you, never with a subagent.
+coordinator for several tickets worked on at the same time. Subagents do the work;
+every approval gate stays with you.
 
 **Model:** Use the most capable model available for the coordinator. Each subagent uses
 the model its command file names (plan and build: most capable; review: mid-tier).
@@ -29,28 +28,6 @@ the model its command file names (plan and build: most capable; review: mid-tier
 
 ---
 
-## Why it's shaped this way
-
-- **Subagents can't pause for the user.** A subagent runs to completion and returns one
-  report. So the work is split into a parallel **plan** round, an approval gate held by
-  you, and a **build** round. The user sees and approves every plan before any code is
-  written.
-- **Subagents run in the background.** You stay free to talk to the user while they
-  work, and you're notified as each one finishes. So each ticket moves on as soon as it's
-  ready; nothing waits for the rest of its wave.
-- **Subagents can't start subagents.** Only you can dispatch an independent reviewer, so
-  review is a step of yours, not of the build agent.
-- **Each build agent gets its own git worktree** (Agent tool, `isolation: "worktree"`).
-  Worktrees share the repository (objects, branches) but not working files, so agents
-  can't overwrite each other.
-- **Git-ignored files don't exist in a worktree.** `.claude/plans/` and
-  `.claude/artifacts/` are usually ignored, so every path you hand a subagent must be an
-  **absolute path into the main checkout**, computed at run time. Never hardcode a path.
-- **Subagents start with no context.** They only know what your prompt tells them.
-  Include everything they need: absolute paths, the ticket text, the overrides below.
-
----
-
 ## Step 0 — Preflight
 
 1. Resolve, from your own session (the main checkout):
@@ -58,7 +35,7 @@ the model its command file names (plan and build: most capable; review: mid-tier
    - `BASE` = `--base`, else `main`, else `master`
    - `PLUGIN` = `${CLAUDE_PLUGIN_ROOT}` (pass it to subagents as an absolute path)
    - `SNAPSHOT` = `ROOT/.claude/worktrees/devcycle-base`, a read-only checkout of `BASE`
-     for plan agents, so the user can switch branches in `ROOT` during the run.
+     for plan agents.
 2. **Is `BASE` up to date?** If `BASE` is a local branch with a remote, run
    `git fetch origin <BASE>` and count `git rev-list --count <BASE>..origin/<BASE>`. If
    it's behind, tell the user by how many commits and ask, getting an explicit answer —
@@ -73,8 +50,7 @@ the model its command file names (plan and build: most capable; review: mid-tier
 3. **Prepare `SNAPSHOT`** at the (possibly updated) `BASE`:
    - If it exists and is clean: `git -C <SNAPSHOT> checkout --detach <BASE>`.
    - If it exists with changes (e.g. left by a crashed run): remove it with
-     `git worktree remove --force <SNAPSHOT>` and recreate it. Only plan agents use it,
-     read-only, so nothing of value is lost.
+     `git worktree remove --force <SNAPSHOT>` and recreate it.
    - Otherwise: `git worktree add --detach <SNAPSHOT> <BASE>`.
 4. If `ROOT` is not on `BASE` or has uncommitted changes, warn the user: every agent
    starts from `BASE`, so neither the current branch's commits nor uncommitted work are
@@ -95,39 +71,50 @@ the model its command file names (plan and build: most capable; review: mid-tier
    3. Branch naming: default `<ticket>-<slug>`, unless the project's conventions (from
       discovery) say otherwise. Check each name with `git branch --list <name>`; if one
       already exists (e.g. a rerun), ask whether to use a suffixed name or skip that ticket.
-   4. **Worktree setup.** A worktree has only tracked files, so it lacks gitignored
-      config (`.env`, `config/master.key`, …), installed dependencies and its own test
-      database. Look for a **Worktree setup** section in the project's testing conventions
+   4. **Worktree setup.** Worktrees lack git-ignored config (`.env`,
+      `config/master.key`, …), installed dependencies and their own test database. Look
+      for a **Worktree setup** section in the project's testing conventions
       (e.g. `.claude/resources/testing.md`) and a `.worktreeinclude` file at `ROOT`. If
       either is missing and tests will run, show the user what's missing and suggest the
       fix (see the plugin README) before continuing.
 
 Do not proceed until the user answers.
 
+8. **Discover once.** Set `RUN` = `ROOT/.claude/artifacts/parallel` (create it; a new run
+   overwrites it). Write the facts from your discovery to `CONTEXT` = `RUN/context.md`:
+   - The detected stack.
+   - The guidance files that exist (`CLAUDE.md` files, `.claude/resources/*.md`,
+     best-practice docs, lint/style config), each with one line on what it covers.
+     Tracked files as repo-relative paths; git-ignored ones as absolute `ROOT` paths.
+   - The commands for tests (scoped to a file or test), lint and type-check, and each
+     one's quiet or failures-only option, if any.
+   - The worktree setup commands.
+   Facts only: no opinions about the code or the tickets.
+
 ---
 
 ## Step 1 — Plan round (parallel, read-only)
 
 For the current wave, dispatch **one Agent per ticket in a single message** so they run
-concurrently, at most `--max` at a time. No worktree is needed: planning only reads code
-and writes into `ROOT/.claude/plans/`.
+concurrently, at most `--max` at a time, without a worktree.
 
 Each plan agent's prompt must contain:
 
-- The full ticket text.
-- Where to read code from: `SNAPSHOT` for wave 1. For a stacked ticket, its blocker's
-  **worktree path** (absolute), since the blocker's changes exist only there; with several
-  blockers, also name the other blockers' branches so it can read them with
-  `git show <branch>:<path>`. Read the project's guidance files (`CLAUDE.md`,
-  `.claude/resources/`) from there too; if one is git-ignored and missing, read it from
-  `ROOT`.
-- "Follow `PLUGIN/commands/plan.md` and `PLUGIN/resources/project-context.md`."
+- The shared rules (see Guardrails).
+- "Follow `PLUGIN/commands/plan.md`. Read `CONTEXT` instead of running discovery
+  yourself, then read the guidance files it lists that apply to this ticket."
 - Overrides for running unattended:
   - You cannot ask the user questions or wait for approval, and you cannot enter plan
     mode. Put open questions and assumptions in a **Open Questions** section at the top
     of the plan instead.
-  - Write the plan to `ROOT/.claude/plans/<YYYY-MM-DD>-<ticket>-<slug>.md`.
-  - Do not modify any other file.
+  - Do not modify any file other than your plan.
+- The full ticket text.
+- Where to write the plan: `ROOT/.claude/plans/<YYYY-MM-DD>-<ticket>-<slug>.md`.
+- Where to read code from: `SNAPSHOT` for wave 1. For a stacked ticket, its blocker's
+  **worktree path** (absolute); with several blockers, also name the other blockers'
+  branches so it can read them with
+  `git show <branch>:<path>`. Read the guidance files `CONTEXT` lists from there too;
+  git-ignored ones from `ROOT`.
 - Return: the plan's absolute path, a summary under 120 words, its open questions, its
   **Files expected to change** list and its estimated size.
 
@@ -136,7 +123,7 @@ Each plan agent's prompt must contain:
 ## Step 2 — Approval gate (you, with the user, one plan at a time)
 
 As plans come back, present each one: ticket, path, summary, open questions, estimated
-size (flag it if over budget). Don't print the plans themselves; give their paths.
+size (flag it if over budget).
 
 **Check for overlap.** Compare its **Files expected to change** list with every other plan
 in this wave and every ticket already building. Show the user each pair of tickets that
@@ -146,10 +133,10 @@ passes review).
 
 For each plan, the user may:
 
-- **Approve** it — start its build (Step 3) **right away**. Don't wait for the rest of the
-  wave; the user can keep reviewing the others while it builds.
+- **Approve** it — start its build (Step 3) **right away**, without waiting for the rest
+  of the wave.
 - **Amend** it — apply the amendment yourself, or send it to that plan agent with
-  `SendMessage` so it revises the plan with its context intact.
+  `SendMessage`.
 - **Drop** it — it and any ticket blocked by it leave this run.
 
 Do not start Step 3 for a ticket until its plan is approved.
@@ -162,16 +149,21 @@ Dispatch the build agent as soon as its plan is approved, with `isolation: "work
 At most `--max` build agents run at once; when the limit is reached, queue approved
 tickets and start the next as one finishes.
 
-Each build agent's prompt must contain:
+First write the ticket's **brief** to `RUN/<ticket>-brief.md`: everything listed below.
+The build agent's prompt is then short — the shared rules (see Guardrails), then:
+"Read your brief at `<brief path>` before anything else and follow it. Keep your
+progress in `RUN/<ticket>-progress.md`. Whenever your context has been summarized,
+re-read the brief and the progress file before continuing."
+
+Each brief must contain:
 
 - The full ticket text and the **absolute** approved plan path.
 - `ROOT`, `BASE`, `PLUGIN`, the branch name, `<start>` (`BASE`, or the blocker's branch
   when stacked), and whether it may run tests and QA (Step 0).
 - **Starting point:**
   - First, rename the worktree's branch: `git branch -m <branch>`.
-  - Wave 1: the branch must start from `BASE`. Worktrees branch from the remote default
-    branch, which may not be `BASE`; if not, `git reset --hard <BASE>` on this fresh
-    branch is fine.
+  - Wave 1: the branch must start from `BASE`; if it doesn't, `git reset --hard <BASE>`
+    (safe on this fresh branch).
   - Later waves (stacked): start from the blocker's branch
     (`git reset --hard <blocker-branch>`); with several blockers, merge the others in and
     stop and report if the merge conflicts.
@@ -180,8 +172,11 @@ Each build agent's prompt must contain:
   per-worktree suffix such as the ticket number. Creating and loading a **test** database
   this way is allowed; migrating any other database is not.
 - "Follow `PLUGIN/commands/dev.md` in `--auto` mode with `--plan <plan path>`, skipping
-  Phase 1 and Phase 4 (review — the coordinator runs it). Use
-  `PLUGIN/resources/project-context.md` for discovery."
+  Phase 1 and Phase 4 (review — the coordinator runs it). Read `CONTEXT` instead of
+  running discovery yourself; read the guidance files it lists that apply."
+- **Progress file:** keep `RUN/<ticket>-progress.md` up to date as you go: each
+  acceptance scenario and its test (written / red / green), the CI checks (passed or
+  not), the dev phase you're in, and decisions you made where the plan was silent.
 - Overrides, which take precedence over `dev.md`, `test.md`, `execute.md` and `qa.md`:
   - You cannot ask the user anything. Wherever those files say to ask, pause, or wait,
     decide using the plan, or — if it's a real blocker — **stop and report it**.
@@ -191,6 +186,9 @@ Each build agent's prompt must contain:
     when every acceptance scenario's test passes and those checks are green; if one can't
     be made green, stop and report which. If not allowed: skip running them and say so in
     your report.
+  - Keep command output short: use the quiet or failures-only options in `CONTEXT`, and
+    otherwise keep only the end of long output (e.g. `2>&1 | tail -n 80`). Run the full
+    output again only when the short form doesn't show why something failed.
   - At the end, commit all your changes to your branch, with a message written per
     `PLUGIN/commands/commit.md`. This is a local commit only — **do not push**.
   - Still never: run migrations, install new dependencies, run destructive commands, or
@@ -203,8 +201,7 @@ Each build agent's prompt must contain:
 - **PR description (Phase 6):** always write it, from the ticket, the plan and your QA
   results (if QA ran), to `.claude/artifacts/<YYYY-MM-DD>-<ticket>-<slug>.pr.md` **inside
   your worktree**. Describe the diff against `<start>` (`git diff <start>...HEAD`), not
-  `main`, so a stacked branch doesn't include its blocker's changes. Don't commit it or
-  the QA script. If the PR template is missing, proceed without one and note it.
+  `main`. Don't commit it or the QA script. If the PR template is missing, proceed without one and note it.
 - Return: branch, worktree path (`git rev-parse --show-toplevel`), commit SHA, test
   result (passed / failed / not run) per acceptance scenario, CI checks result, QA results
   (or not run), the absolute paths of the QA script and PR description, the worktree
@@ -215,24 +212,28 @@ Each build agent's prompt must contain:
 ## Step 4 — Verify and review (you, as each build finishes)
 
 When a build agent reports done, first copy its QA script and PR description into
-`ROOT/.claude/artifacts/` (same filenames; create the folder if needed). From here on,
-those main-checkout copies are the ones you use, update and report — they outlive the
-worktree. Copy again whenever the agent reports back after fixes.
+`ROOT/.claude/artifacts/` (same filenames). From here on, use, update and report those
+copies. Copy again whenever the agent reports back after fixes.
 
 **If the agent wasn't allowed to run tests,** run them now from its worktree path, **one
 branch at a time** (queue the others), with the worktree setup it reported (e.g. its
-`DB_SUFFIX`) so you don't touch a shared database: the tests and checks for what changed
-(see `execute.md`), then the QA script, verifying each `unverified` snippet as `qa.md`
+`DB_SUFFIX`): the tests and checks for what changed (see `execute.md`), then the QA script, verifying each `unverified` snippet as `qa.md`
 describes. Update the QA section of the PR description copy per
 `PLUGIN/commands/pr.md`. If something fails, send the failures to the build agent with
 `SendMessage` to fix, then run them again. Only then review.
 
-Then dispatch a **fresh** review agent with only: the ticket, the plan path, the worktree path (read files there), the diff command
+Then dispatch a **fresh** review agent with only: the shared rules, `CONTEXT`, the
+ticket, the plan path, the worktree path (read files there), the diff command
 `git diff <start>...<branch>` (`<start>` = `BASE`, or the blocker's branch when stacked)
-and `PLUGIN/commands/review.md`. It must not modify files.
+and `PLUGIN/commands/review.md`, telling it to read `CONTEXT` instead of running
+discovery, and to review from the code, tests, ticket and plan only: no commit messages,
+and nothing in `.claude/artifacts/` besides `CONTEXT`. It must not modify files. Never
+give it the build agent's report, its progress file, or your own view of the change.
 
 - **Blocking findings:** send them to that build agent with `SendMessage` to fix, re-run
-  tests and checks (if allowed), and amend or add a commit. Then review once more. If
+  tests and checks (if allowed), and amend or add a commit. Then review once more: send
+  the **same** reviewer, with `SendMessage`, the new diff `git diff <old SHA> <new SHA>`
+  and ask it to confirm each of its findings is fixed and to review the new changes. If
   still blocked, record it and move on.
 - **Passed:** a ticket blocked by this one goes to Step 1 once **all** its blockers have
   passed, planned against this worktree (see Step 1 for several blockers).
@@ -281,8 +282,12 @@ and PR description (`ROOT/.claude/artifacts/`).
   whole reports.
 - Never push or open PRs unless `--pr` was given, and then only after review passes.
 - Never delete a worktree or branch yourself, except `SNAPSHOT`; leave cleanup to the user.
-- Run tests and checks for what changed, not the whole suite (see `execute.md`).
-- Never give a subagent a relative path into `.claude/`.
+- Run tests and checks for what changed, not the whole suite (see `execute.md`), and
+  keep their output short.
+- Agents share facts through `CONTEXT`, never judgments: no agent's report or rationale
+  goes into another agent's prompt, except plans, which are the spec.
+- Give subagents absolute paths into `ROOT` for anything git-ignored (`.claude/plans/`,
+  `.claude/artifacts/`): worktrees don't have those files.
 - If an agent fails or stops, carry on with the others and report it at the end. Don't
   retry automatically.
 - Keep each status update to the user under 120 words.

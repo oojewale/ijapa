@@ -41,12 +41,11 @@ Your job is to produce a thorough, actionable plan before any code is written.
    answers before writing the plan.
 7. Extract the **acceptance scenarios**: copy each Given/When/Then from the ticket's
    Acceptance Criteria, numbered `S1`, `S2`, … If the task has none, write them from the
-   task description (and say so). They are the definition of done that tests and review
-   check against, so each must be concrete and observable — no "works correctly".
+   task description (and say so). Each must be concrete and observable — no "works
+   correctly".
 8. Break the work into clear, ordered, implementable steps. Note which scenario(s) each
    step satisfies.
-9. List every file you expect to create or change, by path. Parallel runs use this list to
-   spot tickets likely to conflict.
+9. List every file you expect to create or change, by path.
 10. Estimate the size of the change. If it's likely to exceed about 400 changed lines
     (excluding generated files and lockfiles) — or the project's own limit, if it sets
     one — propose how to split it into smaller tickets or stacked PRs under Risks.
@@ -117,5 +116,3 @@ Use this structure inside the file:
      saying what question it answers, then the mermaid block.
      If none are needed, write "None — prose suffices." -->
 ```
-
-After writing the file, do NOT print the plan to the conversation.

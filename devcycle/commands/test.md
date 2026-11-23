@@ -74,7 +74,7 @@ implementation has to satisfy.
 ## **Response Structure**
 
 * No extra commentary outside the generated tests, except a short scenario → test map
-  (`S1 → spec/requests/foo_spec.rb:12`), so review can check every scenario is covered.
+  (`S1 → spec/requests/foo_spec.rb:12`).
 * End by asking the user to run the tests and confirm they fail for the right reason
   (TDD red) — i.e. because the implementation does not exist yet, not due to faults in the
   tests themselves.
