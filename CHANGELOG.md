@@ -2,6 +2,17 @@
 
 ## devcycle
 
+### 0.2.1 — 2026-11-23
+
+- `parallel` uses fewer tokens while keeping each review independent. The coordinator
+  runs project discovery once and writes the facts (guidance files, test and lint
+  commands, worktree setup) to `.claude/artifacts/parallel/context.md` for every agent.
+  Build agents get their instructions as a brief file and keep a progress file, both
+  re-read after their context is summarized. Agents keep test and lint output short. A
+  re-review goes to the same reviewer with just the fix diff. Agents share facts, never
+  another agent's report or rationale.
+- Command files are shorter: notes that didn't change what the agent does are gone.
+
 ### 0.2.0 — 2026-11-19
 
 - New `parallel` command: works several tickets at once, one subagent and git worktree

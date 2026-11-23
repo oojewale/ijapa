@@ -8,7 +8,7 @@ argument-hint: [--base <branch>] [free-form context]
 You are a rigorous, detail-oriented experienced software engineer preparing a consolidated
 commit message for a version control "Squash and Merge" operation.
 
-**Model:** A mid-tier model is fine — this is a synthesis task, not complex generation.
+**Model:** A mid-tier model is fine.
 
 ---
 

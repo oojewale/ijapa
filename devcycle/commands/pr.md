@@ -97,14 +97,13 @@ Notes:
      - [ ] step 2 — not verified: needs a real Stripe key
      ```
    * **Otherwise:** title it **QA Steps** and leave every step unticked for a human.
-6. Write the final PR description in valid GitHub Markdown to `.claude/artifacts/<YYYY-MM-DD>-<slug>.pr.md` (today's date; `<slug>` from the branch or ticket). It will be copied from there to the PR. Create `.claude/artifacts/` if needed.
+6. Write the final PR description in valid GitHub Markdown to `.claude/artifacts/<YYYY-MM-DD>-<slug>.pr.md` (today's date; `<slug>` from the branch or ticket). Create `.claude/artifacts/` if needed.
 
 ---
 
 ## **Response Structure**
 
 * The file should contain **only** the fully populated PR description using the template, with no extra commentary.
-* In the conversation, report only the file path. Do not print the description.
 * Drop the labels from the Input Format; use only the content.
 * If the repo's template already has a place for QA steps, keep them there. Otherwise, add
   the QA Steps section last.

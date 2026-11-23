@@ -40,7 +40,7 @@ Rules:
 - Use numbers for Acceptance Criteria, Out of Scope, Dependencies / Notes and Blocked By sections
 - Use checkboxes for the Testing section
 - Expand acceptance criteria beyond what is listed — think through edge cases and unhappy paths
-- Make stories non-blocking as much as possible. So multiple tickets can be worked on in parallel by different people.
+- Make stories non-blocking as much as possible, so they can be worked on in parallel.
 - Keep titles concise and action-oriented
 - Output only the stories, no preamble
 

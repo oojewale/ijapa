@@ -11,14 +11,11 @@
   description, epic, tickets, anything else), report only its path. Do not echo its
   contents to the conversation unless the user asks to see it.
 
-Every command in this plugin is stack-agnostic. Before doing the work, discover how
-*this* project wants things done. Use what you find; degrade gracefully when you find
-nothing.
+Before doing the work, discover how *this* project wants things done.
 
 ## 1. Gather conventions (in this order, use everything that exists)
 
-1. **`CLAUDE.md`** at the repo root and any nested `CLAUDE.md` files — Claude Code
-   usually loads these into context automatically. Treat them as authoritative.
+1. **`CLAUDE.md`** at the repo root and any nested `CLAUDE.md` files.
 2. **`.claude/resources/project-brief.md`** — product and architecture context.
 3. **`.claude/resources/*.md`** matching the task domain, e.g. `backend.md`,
    `frontend.md`, `testing.md`, `api.md`, `voice.md`.
@@ -29,16 +26,8 @@ nothing.
 
 ## 2. Detect the stack
 
-Infer from files in the repo root — do not assume a stack:
-
-- `Gemfile` → Ruby (Rails if `rails` gem present)
-- `package.json` → JS/TS (check for `next`, `react`, `vue`, `svelte`)
-- `pyproject.toml` / `requirements.txt` → Python
-- `go.mod` → Go
-- `Cargo.toml` → Rust
-
-Apply the idioms, tooling, and test framework of the detected stack. Follow any
-project-specific rule from step 1 over a general stack idiom.
+Infer it from the repo's manifest files; don't assume one. Apply its idioms, tooling
+and test framework where the project sets no rule.
 
 ## 3. Degrade gracefully
 
@@ -62,5 +51,4 @@ Never invent a project convention. If you are guessing, say so.
 
 Use today's date for `<YYYY-MM-DD>`. Create the directory if it does not exist.
 
-Plans and artifacts are local working files, not meant to be tracked in git. Never stage
-or commit them.
+Never stage or commit plans or artifacts.

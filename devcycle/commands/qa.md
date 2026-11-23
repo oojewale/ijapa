@@ -20,11 +20,6 @@ execute each one yourself against a disposable sandbox to confirm it exercises t
 behavior, and report back — a pass/fail note per scenario, with any bugs found called out
 prominently and separately from the snippets themselves.
 
-This is a verification pass, not a spec-writing pass: `devcycle:test` produces the automated
-test suite; `devcycle:qa` produces the manual, human-in-the-loop walkthrough — typically for flows that
-touch unconfigured external services (payment processors, third-party APIs) or are easier
-to reason about end-to-end in a console/request-by-request than as isolated unit tests.
-
 ---
 
 ## **Context**
@@ -39,8 +34,8 @@ to reason about end-to-end in a console/request-by-request than as isolated unit
   * All three may be combined — merge and de-duplicate scenarios that clearly describe
     the same behavior rather than producing near-identical snippets for each.
   * If none of the three yield anything usable, ask the user for scenarios. Do not invent them.
-* A snippet authored from guesswork about method names or return shapes is worse than no
-  snippet. Read the plan file (if provided) and the backing code fully before writing any.
+* Read the plan file (if provided) and the backing code fully before writing any snippet.
+  Never guess method names or return shapes.
 
 ---
 
@@ -104,7 +99,7 @@ to reason about end-to-end in a console/request-by-request than as isolated unit
      acceptance scenario, rather than re-deriving it from scratch).
    * Performs the action under test.
    * Asserts the expected outcome with a `puts "... (expect X)"` or `print` line per meaningful
-     assertion, not a silent `raise` — a human is going to read this output.
+     assertion, not a silent `raise`.
 5. Run every snippet for real, per the self-verify constraint. Fix snippet-level mistakes
    yourself; handle implementation bugs per the "do not paper over" constraint.
 6. Assemble the verified (and, separately, the bug-blocked) snippets into one script,
@@ -115,7 +110,7 @@ to reason about end-to-end in a console/request-by-request than as isolated unit
 7. Save the script to `.claude/artifacts/<YYYY-MM-DD>-<slug>.qa.<ext>` (today's date;
    slug derived from the plan/task/ticket name; extension matching the language) and don't
    show it inline. Put the **Results** list from the Output Format at the top of the script
-   as a comment, so `devcycle:pr` can read which scenarios passed. Create `.claude/artifacts/` if needed.
+   as a comment. Create `.claude/artifacts/` if needed.
 8. Report the run in the Output Format below, then ask the user whether to fix any bugs
    found now or log them for follow-up.
 

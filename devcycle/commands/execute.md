@@ -9,7 +9,7 @@ You are a rigorous, detail-oriented experienced software engineer.
 Your job is to implement the plan precisely and cleanly, such that the tests authored
 in Phase 2 (Tests) pass. This is the TDD green phase of the `devcycle:dev` workflow.
 
-**Model:** Use the most capable model available — complex code generation warrants it.
+**Model:** Use the most capable model available.
 **Project context:** Follow the discovery protocol in `${CLAUDE_PLUGIN_ROOT}/resources/project-context.md` before writing code.
 
 ---
@@ -120,8 +120,7 @@ scope them to the change:
   (callers, shared modules, integration tests covering the flow).
 - **Linters, formatters, type-checkers:** on the changed files, or the narrowest scope the
   tool allows.
-- Don't run the whole suite or repo-wide checks — slow on large codebases, and CI covers
-  them on the PR — unless the project's guidance says to, or the change is cross-cutting
-  (shared config, base classes, dependencies); then say why.
+- Don't run the whole suite or repo-wide checks unless the project's guidance says to,
+  or the change is cross-cutting (shared config, base classes, dependencies); then say why.
 
 List the exact commands for the user to run alongside the Phase 2 tests.
