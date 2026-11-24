@@ -2,6 +2,12 @@
 
 ## devcycle
 
+### 0.2.2 — 2026-11-24
+
+- The `parallel` coordinator keeps its own run state (settings, each ticket's status,
+  agents, branches and review rounds) in `.claude/artifacts/parallel/state.md` and
+  re-reads it after its context is summarized, so a long run doesn't lose track.
+
 ### 0.2.1 — 2026-11-23
 
 - `parallel` uses fewer tokens while keeping each review independent. The coordinator

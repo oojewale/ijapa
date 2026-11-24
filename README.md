@@ -130,8 +130,8 @@ What a run looks like:
 5. **Report.** A summary table, plus the paths of each ticket's plan, QA script and PR
    description (all in your main checkout's `.claude/`).
 
-Run files (the shared project facts, and each build agent's brief and progress) go in
-`.claude/artifacts/parallel/`, replaced on the next run.
+Run files (the shared project facts, the coordinator's run state, and each build agent's
+brief and progress) go in `.claude/artifacts/parallel/`, replaced on the next run.
 
 Branches stay local unless you pass `--pr`. To push one yourself:
 `git push -u origin <branch>`, then `gh pr create --head <branch> --body-file <PR description path>`.
