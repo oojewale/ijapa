@@ -90,6 +90,16 @@ Do not proceed until the user answers.
      one's quiet or failures-only option, if any.
    - The worktree setup commands.
    Facts only: no opinions about the code or the tickets.
+9. **Keep your own state in a file.** Write `STATE` = `RUN/state.md` and update it
+   whenever something changes, not at the end:
+   - The run settings: `ROOT`, `BASE`, `PLUGIN`, `SNAPSHOT`, the flags, the user's
+     answers in Step 0 and, once set, `DB_SUFFIX`.
+   - Per ticket: its blockers and wave, status (planning, awaiting approval, queued,
+     building, testing, in review, fixing, passed, stopped), plan path, branch, worktree,
+     start, the IDs of its plan, build and review agents, the last reviewed SHA, and the
+     results Step 5 reports.
+   Whenever your context has been summarized, re-read `STATE` and `CONTEXT` before
+   continuing. `STATE` is yours alone: never give it to a subagent.
 
 ---
 

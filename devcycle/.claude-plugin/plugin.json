@@ -1,6 +1,6 @@
 {
   "name": "devcycle",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Stack-agnostic phase-gated dev workflow: plan, test, execute, review, QA and PR description, one ticket or several in parallel, plus ticket, epic, commit and prune helpers.",
   "author": { "name": "Olaide Ojewale" },
   "license": "MIT",
